@@ -15,6 +15,9 @@ import {MatIconModule} from '@angular/material/icon';
 
 import { TaskService } from './shared/service/task.service';
 import { TasksComponent } from './shared/component/tasks/tasks.component';
+import { FormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
   declarations: [
@@ -30,7 +33,10 @@ import { TasksComponent } from './shared/component/tasks/tasks.component';
     MatButtonModule,
     MatInputModule,
     MatToolbarModule,
-    MatIconModule
+    MatIconModule,
+    FormsModule,
+    MatTableModule,
+    MatPaginatorModule
   ],
   providers: [TaskService],
   bootstrap: [AppComponent]

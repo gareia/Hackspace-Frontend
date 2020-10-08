@@ -17,3 +17,14 @@
 .list-task{
     margin-top: 50%;
 }
+
+.example-table-container {
+    position: relative;
+    max-height: 400px;
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+}
+

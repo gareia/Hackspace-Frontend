@@ -19,13 +19,16 @@ export class TaskService {
   
   httpOptions = {
     headers: new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      'Content-Type': 'application/json'/*,
+      'Accept': 'application/json'*/
     })
   }
 
   getAllTasks(): Observable<Task[]>{
     return this.http.get<Task[]>(this.base_path, this.httpOptions).pipe(retry(2), catchError(this.handleError));
+  }
+  createTask(task: Task): Observable<Task>{
+    return this.http.post<Task>(this.base_path, JSON.stringify(task), this.httpOptions).pipe(retry(2), catchError(this.handleError));
   }
  
 }
