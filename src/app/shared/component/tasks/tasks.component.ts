@@ -15,8 +15,9 @@ export class TasksComponent implements OnInit {
     {id: 1, name: 'jugaaar', completed: false, createdAt: null}
   ];*/
   task: Task;
-  displayedColumns: string[] = ['created', 'name'];
+  displayedColumns: string[] = ['created', 'name', 'delete'];
   dataSource = new MatTableDataSource();
+  overDelete: Boolean = false;
 
   @ViewChild(MatPaginator, {static: true}) 
   paginator: MatPaginator;
@@ -39,13 +40,25 @@ export class TasksComponent implements OnInit {
   createTask(): void {
     //this.tasks.push(this.task);
     this.taskService.createTask(this.task).subscribe(
-      (response: any) => 
+      (response: Task) => 
       { 
         this.dataSource.data.push({...response});
         this.dataSource.data = this.dataSource.data.map(t => t);
       }
     );
-    
+
   }
+  deleteTask(id): void {
+    
+    this.taskService.deleteTask(id).subscribe(
+      (response: any) => 
+      {
+        //filter el id
+        this.dataSource.data = this.dataSource.data.filter((t: Task) => t.id !== id);
+      }
+    );
+
+  }
+  
 
 }
