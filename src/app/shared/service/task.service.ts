@@ -19,8 +19,8 @@ export class TaskService {
   
   httpOptions = {
     headers: new HttpHeaders({
-      'Content-Type': 'application/json'/*,
-      'Accept': 'application/json'*/
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
     })
   }
 
@@ -29,6 +29,9 @@ export class TaskService {
   }
   createTask(task: Task): Observable<Task>{
     return this.http.post<Task>(this.base_path, JSON.stringify(task), this.httpOptions).pipe(retry(2), catchError(this.handleError));
+  }
+  deleteTask(id: number): Observable<any> {
+    return this.http.delete(this.base_path+id, this.httpOptions).pipe(retry(2), catchError(this.handleError));
   }
  
 }
