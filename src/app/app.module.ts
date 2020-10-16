@@ -18,11 +18,14 @@ import { TasksComponent } from './shared/component/tasks/tasks.component';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { EditDialogComponent } from './shared/component/editDialog/edit-dialog/edit-dialog.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
     AppComponent,
-    TasksComponent
+    TasksComponent,
+    EditDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -36,7 +39,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatIconModule,
     FormsModule,
     MatTableModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatDialogModule
   ],
   providers: [TaskService],
   bootstrap: [AppComponent]

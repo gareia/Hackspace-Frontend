@@ -29,7 +29,12 @@ table {
     width: 100%;
 }
 
-mat-icon:hover{
+.delete-icon:hover{
     color: red;
+    cursor: pointer;
+}
+
+.edit-icon:hover{
+    color: blue;
     cursor: pointer;
 }

@@ -24,14 +24,17 @@ export class TaskService {
     })
   }
 
-  getAllTasks(): Observable<Task[]>{
+  getAllTasks(): Observable<Task[]> {
     return this.http.get<Task[]>(this.base_path, this.httpOptions).pipe(retry(2), catchError(this.handleError));
   }
-  createTask(task: Task): Observable<Task>{
+  createTask(task: Task): Observable<Task> {
     return this.http.post<Task>(this.base_path, JSON.stringify(task), this.httpOptions).pipe(retry(2), catchError(this.handleError));
   }
   deleteTask(id: number): Observable<any> {
     return this.http.delete(this.base_path+id, this.httpOptions).pipe(retry(2), catchError(this.handleError));
   }
- 
+  updateTask(id: number, task: Task): Observable<Task> {
+    return this.http.put<Task>(this.base_path+id, JSON.stringify(task), this.httpOptions).pipe(retry(2), catchError(this.handleError));
+  }
+
 }
