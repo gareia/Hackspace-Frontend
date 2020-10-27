@@ -1,3 +1,5 @@
+import { SelectionModel } from '@angular/cdk/collections';
+import { DataSource } from '@angular/cdk/table';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -18,8 +20,11 @@ export class TasksComponent implements OnInit {
   ];*/
   task: Task;
   updatedTask: Task;
-  displayedColumns: string[] = ['created', 'name', 'actions'];
-  dataSource = new MatTableDataSource();
+  displayedColumns: string[] = ['select', 'created', 'name', 'actions'];
+  //dataSource = new MatTableDataSource();
+  //tasksCompleted = new MatTableDataSource();
+  tasksIncompleted = new MatTableDataSource<Task>();
+  selection = new SelectionModel<Task>(true, []);
 
   @ViewChild(MatPaginator, {static: true}) 
   paginator: MatPaginator;
@@ -30,23 +35,29 @@ export class TasksComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataSource.paginator = this.paginator;
+    //this.tasksCompleted.paginator = this.paginator;
+    this.tasksIncompleted.paginator = this.paginator;
     this.getTasks();
   }
+
 
   //response.content just data | response includes pagination
   getTasks(): void {
     this.taskService.getAllTasks().subscribe(
-      (response: any) => {this.dataSource.data = response.content;}
+      (response: any) => {
+        this.tasksIncompleted.data = response.content;
+        this.tasksIncompleted.data = this.tasksIncompleted.data.filter((t: Task) => t.completed == false);
+      
+      }
     );
+   
   }
   createTask(): void {
-    //this.tasks.push(this.task);
     this.taskService.createTask(this.task).subscribe(
       (response: Task) => 
       { 
-        this.dataSource.data.push({...response});
-        this.dataSource.data = this.dataSource.data.map(t => t);
+        this.tasksIncompleted.data.push({...response});
+        this.tasksIncompleted.data = this.tasksIncompleted.data.map(t => t);
         this.task.name=undefined;
       }
     );
@@ -55,26 +66,29 @@ export class TasksComponent implements OnInit {
     this.taskService.deleteTask(id).subscribe(
       (response: any) => 
       {
-        //filter el id
-        this.dataSource.data = this.dataSource.data.filter((t: Task) => t.id !== id); //? t:false
+        this.tasksIncompleted.data = this.tasksIncompleted.data.filter((t: Task) => t.id !== id); //? t:false
       }
     );
   }
-  updateTask(id): void {
+  updateTask(id): void { //2dialog para confirmar update y delete 3mostrar checkeados
     this.taskService.updateTask(id, this.updatedTask).subscribe((response: Task) => 
     {
       console.log(response);
-      this.dataSource.data = this.dataSource.data.map((t: Task) => {
-        if(t.id == response.id)
-          t = response
-        return t;
-      });
+      if(response.completed == true){
+        this.tasksIncompleted.data = this.tasksIncompleted.data.filter((t: Task) => t.id != id);
+      }else{
+        this.tasksIncompleted.data = this.tasksIncompleted.data.map((t: Task) => {
+          if(t.id == response.id)
+            t = response
+          return t;
+        });
+      }
     });
-
   }
-
-  openDialog(task): void {
-    this.updatedTask.name = task.name
+  openDialog(task: Task): void {
+    console.log(task);
+    this.updatedTask.name = task.name;
+    this.updatedTask.completed = task.completed;
     const dialogRef = this.dialog.open(EditDialogComponent, 
       {width: '250px', data: {
         name: this.updatedTask.name
@@ -83,10 +97,19 @@ export class TasksComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if(result){
         this.updatedTask.name = result;
+        console.log(this.updatedTask);
         this.updateTask(task.id)
       }
     });
   }
+  checkTask(task: Task): void{
+    this.selection.isSelected(task);
+    this.updatedTask.name = task.name;
+    this.updatedTask.completed = true;
+    console.log('what is being sent', this.updatedTask);
+    this.updateTask(task.id);
+  }
+
   
 
 }

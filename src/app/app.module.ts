@@ -20,6 +20,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { EditDialogComponent } from './shared/component/editDialog/edit-dialog/edit-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     FormsModule,
     MatTableModule,
     MatPaginatorModule,
-    MatDialogModule
+    MatDialogModule,
+    MatCheckboxModule
   ],
   providers: [TaskService],
   bootstrap: [AppComponent]
