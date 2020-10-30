@@ -1,9 +1,12 @@
+import { SelectionModel } from '@angular/cdk/collections';
+import { DataSource } from '@angular/cdk/table';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Task } from '../../model/task';
 import { TaskService } from '../../service/task.service';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { EditDialogComponent } from '../editDialog/edit-dialog/edit-dialog.component';
 
 @Component({
@@ -18,8 +21,11 @@ export class TasksComponent implements OnInit {
   ];*/
   task: Task;
   updatedTask: Task;
-  displayedColumns: string[] = ['created', 'name', 'actions'];
-  dataSource = new MatTableDataSource();
+  displayedColumnsComplTasks: string[] = ['select', 'created', 'name', 'actions'];
+  displayedColumnsIncomplTasks: string[] = ['created', 'name'];
+  tasksCompleted = new MatTableDataSource();
+  tasksIncompleted = new MatTableDataSource<Task>();
+  selection = new SelectionModel<Task>(true, []);
 
   @ViewChild(MatPaginator, {static: true}) 
   paginator: MatPaginator;
@@ -30,23 +36,28 @@ export class TasksComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataSource.paginator = this.paginator;
+    this.tasksCompleted.paginator = this.paginator; //is this ok????
+    this.tasksIncompleted.paginator = this.paginator;
     this.getTasks();
   }
 
   //response.content just data | response includes pagination
   getTasks(): void {
     this.taskService.getAllTasks().subscribe(
-      (response: any) => {this.dataSource.data = response.content;}
+      (response: any) => {
+        this.tasksIncompleted.data = response.content;
+        this.tasksCompleted.data = response.content;
+        this.tasksIncompleted.data = this.tasksIncompleted.data.filter((t: Task) => t.completed == false);
+        this.tasksCompleted.data = this.tasksCompleted.data.filter((t: Task) => t.completed == true);
+      }
     );
   }
   createTask(): void {
-    //this.tasks.push(this.task);
     this.taskService.createTask(this.task).subscribe(
       (response: Task) => 
       { 
-        this.dataSource.data.push({...response});
-        this.dataSource.data = this.dataSource.data.map(t => t);
+        this.tasksIncompleted.data.push({...response});
+        this.tasksIncompleted.data = this.tasksIncompleted.data.map(t => t);
         this.task.name=undefined;
       }
     );
@@ -55,31 +66,33 @@ export class TasksComponent implements OnInit {
     this.taskService.deleteTask(id).subscribe(
       (response: any) => 
       {
-        //filter el id
-        this.dataSource.data = this.dataSource.data.filter((t: Task) => t.id !== id); //? t:false
+        this.tasksIncompleted.data = this.tasksIncompleted.data.filter((t: Task) => t.id !== id); //? t:false
       }
     );
   }
-  updateTask(id): void {
+  updateTask(id): void { //4dialog para confirmar delete
     this.taskService.updateTask(id, this.updatedTask).subscribe((response: Task) => 
     {
       console.log(response);
-      this.dataSource.data = this.dataSource.data.map((t: Task) => {
-        if(t.id == response.id)
-          t = response
-        return t;
-      });
+      if(response.completed == true){
+        this.tasksIncompleted.data = this.tasksIncompleted.data.filter((t: Task) => t.id != id);
+        this.tasksCompleted.data.push({...response});
+        this.tasksCompleted.data = this.tasksCompleted.data.map(t => t);
+      }else{
+        this.tasksIncompleted.data = this.tasksIncompleted.data.map((t: Task) => {
+          if(t.id == response.id)
+            t = response
+          return t;
+        });
+      }
     });
-
   }
-
-  openDialog(task): void {
-    this.updatedTask.name = task.name
+  editDialog(task: Task): void {
+    this.updatedTask.name = task.name;
+    this.updatedTask.completed = task.completed;
     const dialogRef = this.dialog.open(EditDialogComponent, 
-      {width: '250px', data: {
-        name: this.updatedTask.name
-        }
-      });
+      {width: '250px', data: { name: this.updatedTask.name }}
+    );
     dialogRef.afterClosed().subscribe(result => {
       if(result){
         this.updatedTask.name = result;
@@ -87,6 +100,24 @@ export class TasksComponent implements OnInit {
       }
     });
   }
-  
+  checkTask(task: Task, event): void{
+    //this.selection.toggle(task);
+    this.selection.select(task);
+    
+    if(this.selection.isSelected(task)){
+      this.updatedTask.name = task.name;
+      this.updatedTask.completed = true;
+      const dialogRef = this.dialog.open(ConfirmDialogComponent,
+        {data:{action: "haber terminado"}}
+      );
+      dialogRef.afterClosed().subscribe(result => {
+        if(result){
+          this.updateTask(task.id);
+        }else{
+          this.selection.deselect(task);
+        }
+      });
+    }
+  }
 
 }
