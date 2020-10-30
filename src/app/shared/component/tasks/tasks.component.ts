@@ -22,7 +22,7 @@ export class TasksComponent implements OnInit {
   task: Task;
   updatedTask: Task;
   displayedColumnsComplTasks: string[] = ['select', 'created', 'name', 'actions'];
-  displayedColumnsIncomplTasks: string[] = ['created', 'name'];
+  displayedColumnsIncomplTasks: string[] = ['created', 'name', 'actions'];
   tasksCompleted = new MatTableDataSource();
   tasksIncompleted = new MatTableDataSource<Task>();
   selection = new SelectionModel<Task>(true, []);
@@ -62,11 +62,15 @@ export class TasksComponent implements OnInit {
       }
     );
   }
-  deleteTask(id): void {
+  deleteTask(id, isCompleted): void {
     this.taskService.deleteTask(id).subscribe(
       (response: any) => 
       {
-        this.tasksIncompleted.data = this.tasksIncompleted.data.filter((t: Task) => t.id !== id); //? t:false
+        if(isCompleted){
+          this.tasksCompleted.data = this.tasksCompleted.data.filter((t: Task)=> t.id !== id);//por mientras
+        }else{
+          this.tasksIncompleted.data = this.tasksIncompleted.data.filter((t: Task) => t.id !== id); //? t:false
+        }
       }
     );
   }
@@ -76,7 +80,7 @@ export class TasksComponent implements OnInit {
     );
     dialogRef.afterClosed().subscribe(result => {
       if(result){
-        this.deleteTask(task.id);
+        this.deleteTask(task.id, task.completed);
       }
     });
   }
