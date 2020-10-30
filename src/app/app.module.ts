@@ -21,12 +21,15 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { EditDialogComponent } from './shared/component/editDialog/edit-dialog/edit-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { ConfirmDialogComponent } from './shared/component/confirm-dialog/confirm-dialog.component';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @NgModule({
   declarations: [
     AppComponent,
     TasksComponent,
-    EditDialogComponent
+    EditDialogComponent,
+    ConfirmDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -42,7 +45,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatTableModule,
     MatPaginatorModule,
     MatDialogModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatTabsModule
   ],
   providers: [TaskService],
   bootstrap: [AppComponent]

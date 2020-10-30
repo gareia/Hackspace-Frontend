@@ -6,6 +6,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Task } from '../../model/task';
 import { TaskService } from '../../service/task.service';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { EditDialogComponent } from '../editDialog/edit-dialog/edit-dialog.component';
 
 @Component({
@@ -20,9 +21,9 @@ export class TasksComponent implements OnInit {
   ];*/
   task: Task;
   updatedTask: Task;
-  displayedColumns: string[] = ['select', 'created', 'name', 'actions'];
-  //dataSource = new MatTableDataSource();
-  //tasksCompleted = new MatTableDataSource();
+  displayedColumnsComplTasks: string[] = ['select', 'created', 'name', 'actions'];
+  displayedColumnsIncomplTasks: string[] = ['created', 'name'];
+  tasksCompleted = new MatTableDataSource();
   tasksIncompleted = new MatTableDataSource<Task>();
   selection = new SelectionModel<Task>(true, []);
 
@@ -35,22 +36,21 @@ export class TasksComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //this.tasksCompleted.paginator = this.paginator;
+    this.tasksCompleted.paginator = this.paginator; //is this ok????
     this.tasksIncompleted.paginator = this.paginator;
     this.getTasks();
   }
-
 
   //response.content just data | response includes pagination
   getTasks(): void {
     this.taskService.getAllTasks().subscribe(
       (response: any) => {
         this.tasksIncompleted.data = response.content;
+        this.tasksCompleted.data = response.content;
         this.tasksIncompleted.data = this.tasksIncompleted.data.filter((t: Task) => t.completed == false);
-      
+        this.tasksCompleted.data = this.tasksCompleted.data.filter((t: Task) => t.completed == true);
       }
     );
-   
   }
   createTask(): void {
     this.taskService.createTask(this.task).subscribe(
@@ -70,12 +70,14 @@ export class TasksComponent implements OnInit {
       }
     );
   }
-  updateTask(id): void { //2dialog para confirmar update y delete 3mostrar checkeados
+  updateTask(id): void { //4dialog para confirmar delete
     this.taskService.updateTask(id, this.updatedTask).subscribe((response: Task) => 
     {
       console.log(response);
       if(response.completed == true){
         this.tasksIncompleted.data = this.tasksIncompleted.data.filter((t: Task) => t.id != id);
+        this.tasksCompleted.data.push({...response});
+        this.tasksCompleted.data = this.tasksCompleted.data.map(t => t);
       }else{
         this.tasksIncompleted.data = this.tasksIncompleted.data.map((t: Task) => {
           if(t.id == response.id)
@@ -85,31 +87,37 @@ export class TasksComponent implements OnInit {
       }
     });
   }
-  openDialog(task: Task): void {
-    console.log(task);
+  editDialog(task: Task): void {
     this.updatedTask.name = task.name;
     this.updatedTask.completed = task.completed;
     const dialogRef = this.dialog.open(EditDialogComponent, 
-      {width: '250px', data: {
-        name: this.updatedTask.name
-        }
-      });
+      {width: '250px', data: { name: this.updatedTask.name }}
+    );
     dialogRef.afterClosed().subscribe(result => {
       if(result){
         this.updatedTask.name = result;
-        console.log(this.updatedTask);
         this.updateTask(task.id)
       }
     });
   }
-  checkTask(task: Task): void{
-    this.selection.isSelected(task);
-    this.updatedTask.name = task.name;
-    this.updatedTask.completed = true;
-    console.log('what is being sent', this.updatedTask);
-    this.updateTask(task.id);
+  checkTask(task: Task, event): void{
+    //this.selection.toggle(task);
+    this.selection.select(task);
+    
+    if(this.selection.isSelected(task)){
+      this.updatedTask.name = task.name;
+      this.updatedTask.completed = true;
+      const dialogRef = this.dialog.open(ConfirmDialogComponent,
+        {data:{action: "haber terminado"}}
+      );
+      dialogRef.afterClosed().subscribe(result => {
+        if(result){
+          this.updateTask(task.id);
+        }else{
+          this.selection.deselect(task);
+        }
+      });
+    }
   }
-
-  
 
 }
