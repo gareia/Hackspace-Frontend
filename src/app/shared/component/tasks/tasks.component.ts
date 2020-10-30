@@ -70,7 +70,18 @@ export class TasksComponent implements OnInit {
       }
     );
   }
-  updateTask(id): void { //4dialog para confirmar delete
+  deleteDialog(task: Task): void{
+    const dialogRef = this.dialog.open(ConfirmDialogComponent,
+      {data:{action: "eliminar"}}
+    );
+    dialogRef.afterClosed().subscribe(result => {
+      if(result){
+        this.deleteTask(task.id);
+      }
+    });
+  }
+
+  updateTask(id): void { 
     this.taskService.updateTask(id, this.updatedTask).subscribe((response: Task) => 
     {
       console.log(response);
@@ -100,7 +111,7 @@ export class TasksComponent implements OnInit {
       }
     });
   }
-  checkTask(task: Task, event): void{
+  checkDialog(task: Task, event): void{
     //this.selection.toggle(task);
     this.selection.select(task);
     
