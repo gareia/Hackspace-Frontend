@@ -1,5 +1,5 @@
 
-<mat-tab-group mat-align-tabs="start">
+<mat-tab-group id="tabs" color="accent" backgroundColor="accent" mat-align-tabs="start">
 
   <mat-tab label="Tasks incompleted">
     <div class="entry-task">
@@ -50,7 +50,7 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumnsComplTasks;"></tr>
       </table>
     </div>
-    <mat-paginator [length]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 15]"></mat-paginator>
+    <mat-paginator class="paginator" [length]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 15]"></mat-paginator>
   </mat-tab>
 
   <mat-tab label="Tasks completed">
@@ -80,6 +80,6 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumnsIncomplTasks;"></tr>
       </table>
     </div>
-    <mat-paginator [length]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 15]"></mat-paginator>
+    <mat-paginator class="paginator" [length]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 15]"></mat-paginator>
   </mat-tab>
 </mat-tab-group>

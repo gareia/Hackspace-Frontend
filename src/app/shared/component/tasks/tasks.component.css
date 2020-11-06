@@ -1,4 +1,5 @@
 
+
 .example-full-width {
     width: 100%;
 }
@@ -27,6 +28,10 @@
 
 table {
     width: 100%;
+}
+
+table, .paginator{
+    background-color: floralwhite;
 }
 
 .delete-icon:hover{
