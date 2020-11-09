@@ -21,10 +21,10 @@ export class TasksComponent implements OnInit {
   ];*/
   task: Task;
   updatedTask: Task;
-  displayedColumnsComplTasks: string[] = ['select', 'created', 'name', 'actions'];
-  displayedColumnsIncomplTasks: string[] = ['created', 'name', 'actions'];
+  displayedColumnsUncomplTasks: string[] = ['select', 'created', 'name', 'actions'];
+  displayedColumnsComplTasks: string[] = ['created', 'name', 'actions'];
   tasksCompleted = new MatTableDataSource();
-  tasksIncompleted = new MatTableDataSource<Task>();
+  tasksUncompleted = new MatTableDataSource<Task>();
   selection = new SelectionModel<Task>(true, []);
 
   @ViewChild(MatPaginator, {static: true}) 
@@ -37,7 +37,7 @@ export class TasksComponent implements OnInit {
 
   ngOnInit(): void {
     this.tasksCompleted.paginator = this.paginator; //is this ok????
-    this.tasksIncompleted.paginator = this.paginator;
+    this.tasksUncompleted.paginator = this.paginator;
     this.getTasks();
   }
 
@@ -45,9 +45,9 @@ export class TasksComponent implements OnInit {
   getTasks(): void {
     this.taskService.getAllTasks().subscribe(
       (response: any) => {
-        this.tasksIncompleted.data = response.content;
+        this.tasksUncompleted.data = response.content;
         this.tasksCompleted.data = response.content;
-        this.tasksIncompleted.data = this.tasksIncompleted.data.filter((t: Task) => t.completed == false);
+        this.tasksUncompleted.data = this.tasksUncompleted.data.filter((t: Task) => t.completed == false);
         this.tasksCompleted.data = this.tasksCompleted.data.filter((t: Task) => t.completed == true);
       }
     );
@@ -56,8 +56,8 @@ export class TasksComponent implements OnInit {
     this.taskService.createTask(this.task).subscribe(
       (response: Task) => 
       { 
-        this.tasksIncompleted.data.push({...response});
-        this.tasksIncompleted.data = this.tasksIncompleted.data.map(t => t);
+        this.tasksUncompleted.data.push({...response});
+        this.tasksUncompleted.data = this.tasksUncompleted.data.map(t => t);
         this.task.name=undefined;
       }
     );
@@ -69,7 +69,7 @@ export class TasksComponent implements OnInit {
         if(isCompleted){
           this.tasksCompleted.data = this.tasksCompleted.data.filter((t: Task)=> t.id !== id);//por mientras
         }else{
-          this.tasksIncompleted.data = this.tasksIncompleted.data.filter((t: Task) => t.id !== id); //? t:false
+          this.tasksUncompleted.data = this.tasksUncompleted.data.filter((t: Task) => t.id !== id); //? t:false
         }
       }
     );
@@ -90,11 +90,11 @@ export class TasksComponent implements OnInit {
     {
       console.log(response);
       if(response.completed == true){
-        this.tasksIncompleted.data = this.tasksIncompleted.data.filter((t: Task) => t.id != id);
+        this.tasksUncompleted.data = this.tasksUncompleted.data.filter((t: Task) => t.id != id);
         this.tasksCompleted.data.push({...response});
         this.tasksCompleted.data = this.tasksCompleted.data.map(t => t);
       }else{
-        this.tasksIncompleted.data = this.tasksIncompleted.data.map((t: Task) => {
+        this.tasksUncompleted.data = this.tasksUncompleted.data.map((t: Task) => {
           if(t.id == response.id)
             t = response
           return t;

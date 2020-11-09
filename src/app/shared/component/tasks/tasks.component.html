@@ -1,7 +1,7 @@
 
 <mat-tab-group id="tabs" color="accent" backgroundColor="accent" mat-align-tabs="start">
 
-  <mat-tab label="Tasks incompleted">
+  <mat-tab label="Tasks uncompleted">
     <div class="entry-task">
       <form class="example-form">
         <mat-form-field class="example-full-width">
@@ -13,7 +13,7 @@
     </div>
 
     <div class="example-table-container">
-      <table mat-table [dataSource]="tasksIncompleted" class="mat-elevation-z8">
+      <table mat-table [dataSource]="tasksUncompleted" class="mat-elevation-z8">
 
         <ng-container matColumnDef="select">
           <th mat-header-cell *matHeaderCellDef> Select </th>
@@ -46,8 +46,8 @@
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumnsComplTasks"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumnsComplTasks;"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsUncomplTasks"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsUncomplTasks;"></tr>
       </table>
     </div>
     <mat-paginator class="paginator" [length]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 15]"></mat-paginator>
@@ -76,8 +76,8 @@
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumnsIncomplTasks"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumnsIncomplTasks;"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsComplTasks"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsComplTasks;"></tr>
       </table>
     </div>
     <mat-paginator class="paginator" [length]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 15]"></mat-paginator>
